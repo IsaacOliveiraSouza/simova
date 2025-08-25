@@ -1,0 +1,157 @@
+Auth
+	idEmpresa long
+	idFilial long
+	idLocal long
+	seqFuncionario SeqFuncionario
+
+AuthInput
+	idEmpresa Empresa
+	descricaoEmpresa Str autoFill=idEmpresa.NOME
+	idFilial Filial autoFillWhenOneItem
+	descricaoFilial Str autoFill=idFilial.NOME
+	idLocal Local autoFillWhenOneItem
+	descricaoLocal Str autoFill=idLocal.NOME
+	
+
+	idChaveAcesso int notFormatThousand onlineValidate=chave
+
+	crachaFuncionario Str onlineValidate=Valida_Cracha
+	seqFuncionario long notFill
+	nomeFuncionario Str notFill
+	
+	confirmaConfig boolean notShowNo
+	fieldEvents
+		filterListRecord
+			idFilial
+				return listRecord.EMPRESA_SEQ_DB == idEmpresa.SEQ_DB
+			idLocal
+				return listRecord.FILIAL_SEQ_DB == idFilial.SEQ_DB
+		getInputScreenLabel
+			confirmaConfig
+				return lang=custom.msgCustomConfirmaConfig
+	
+	
+	
+Boletim sync=out confirm=Create|Finish
+	id inc
+	SEQ_DB_DEVICE long uuid
+	
+	dataInicial Now timeTypeField=tipoData
+	flagOnlineInicial int notFill onlineFlagCreate
+	locationInicial Location inlineData
+
+	codigoEquipamento Str
+
+	apontamentoServico List<ApontamentoServico> transient
+	apontamentoParada List<ApontamentoParada> transient
+	
+
+	dataFinal Now timeTypeField=tipoDataFinal fill=Finish
+	flagOnlineFinal int notFill onlineFlagFinish fill=Finish
+	locationFinal Location inlineData fill=Finish
+	
+	server name=Efetivo_Boletim
+	// crudActions
+	// 	Apontamento
+	// 		isVisible
+	// 			return true
+	// 		crud Apontamento
+
+// Apontamento sync=out cleanupDays=7
+// 	id inc
+// 	boletim Boletim hide
+// 	seqEquipamento SeqEquipamento
+	
+// 	data Now timeTypeField=tipoData
+// //	flagOnline int notFill onlineFlagCreate
+// 	location Location inlineData
+
+// 	SEQ_DB_DEVICE long uuid
+// 	SEQ_DB_DEVICE_MASTER long autoFill=boletim.SEQ_DB_DEVICE
+
+// 	tipoOperacao TIPO_OPERACAO
+// 	//Verifica se o campo deve ser preenchido.
+// 	servico Servico fillCondition="tipoOperacao == 1"
+// 	parada  Parada  fillCondition="tipoOperacao == 2"	
+			
+ApontamentoServico sync=out cleanupDays=7
+	id inc
+	seqFuncionario SeqFuncionario
+		
+	boletim Boletim
+		
+	SEQ_DB_DEVICE_MASTER long autofill=boletim.SEQ_DB_DEVICE
+	SEQ_DB_DEVICE long uuid
+	
+	data Now timeTypeField=tipoData
+	flagOnline int notFill onlineFlagCreate
+	location Location inlineData
+	
+	tipoOperacao int autoFill=%TipoServico
+	servico Servico
+	server name=Efetivo_Apt
+	
+	
+ApontamentoParada sync=out cleanupDays=7
+	id inc
+	seqFuncionario SeqFuncionario
+		
+	boletim Boletim
+	
+	SEQ_DB_DEVICE_MASTER long autofill=boletim.SEQ_DB_DEVICE
+	SEQ_DB_DEVICE long uuid
+	
+	data Now timeTypeField=tipoData
+	flagOnline int notFill onlineFlagCreate
+	location Location inlineData
+	
+	tipoOperacao int autoFill=%TipoParada
+	parada Parada
+	server name=Efetivo_Apt
+
+// Operacao sync=in descriptionFields=CODIGO,DESCRICAO searchFields=CODIGO,DESCRICAO typeSearchContains typeSearchAfterPressButton
+// 	SEQ_DB long
+// 	CODIGO Str
+// 	DESCRICAO Str
+// 	TIPO_OPERACAO int
+// 	server name=Operacao_Mobile
+	
+Servico sync=beforeInstall|in descriptionFields=CODIGO,DESCRICAO searchFields=CODIGO,DESCRICAO typeSearchContains typeSearchAfterPressButton
+	SEQ_DB long hide
+	CODIGO Str
+	DESCRICAO text
+	Server name Servico_Mobile
+	
+Parada sync=beforeInstall|in descriptionFields=CODIGO,DESCRICAO searchFields=CODIGO,DESCRICAO typeSearchContains typeSearchAfterPressButton
+	SEQ_DB long
+	CODIGO Str
+	DESCRICAO text
+	server name Parada_Mobile
+	
+//Busca de informações no BD antes da instalação
+Empresa sync=beforeInstall|in
+	SEQ_DB long
+	NOME String
+
+//Busca de informações no BD antes da instalação
+Filial sync=beforeInstall|in
+	SEQ_DB long
+	NOME String
+	EMPRESA_SEQ_DB long
+
+//Busca de informações no BD antes da instalação
+Local sync=beforeInstall|in
+	SEQ_DB long 
+	NOME String
+	TIMEZONE String
+	FILIAL_SEQ_DB long
+	
+SeqEquipamento
+	id long
+
+SeqFuncionario
+	id long
+	
+TIPO_OPERACAO
+	id int
+	desc Str
