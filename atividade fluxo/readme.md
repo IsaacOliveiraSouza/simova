@@ -80,4 +80,6 @@ Representam registros de atividades dentro de um boletim:
 
 Representação visual do fluxo entre Xmova e NFS:
 
-📌 [Fluxo Xmova ↔ NFS (imagem)](sandbox:/mnt/data/fluxo_xmova_nfs.png)
+📌 ![Fluxo Xmova ↔ NFS](fluxo_xmova_nfs.png)
+
+
